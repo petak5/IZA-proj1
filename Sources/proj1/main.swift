@@ -14,7 +14,38 @@ func main() -> Result<Void, RunError> {
     // *******************
     // * NOT IMPLEMENTED *
     // *******************
-    .failure(.notImplemented)
+    
+    if CommandLine.arguments.capacity != 3 {
+        return .failure(.invalidArguments)
+    }
+    
+    let inputSymbols = CommandLine.arguments[1]
+    let automataPath = NSString(string: CommandLine.arguments[2]).expandingTildeInPath
+    
+    guard let file: FileHandle = FileHandle(forReadingAtPath: automataPath) else {
+        print(automataPath)
+        return .failure(.fileHandlingError)
+    }
+    
+    let fileData = file.readDataToEndOfFile()
+    file.closeFile()
+    
+    var automata: FiniteAutomata?
+    do {
+        try automata = JSONDecoder().decode(FiniteAutomata.self, from: fileData)
+    }
+    catch {
+        return .failure(.automataDecodingError)
+    }
+    
+    if let _automata = automata {
+        let simulator = Simulator(finiteAutomata: _automata)
+        for state in simulator.simulate(on: inputSymbols) {
+            print(state)
+        }
+    }
+    
+    return .success(Void())
 }
 
 // MARK: - program body
