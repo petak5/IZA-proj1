@@ -11,9 +11,9 @@ import Simulator
 
 // MARK: - Main
 func main() -> Result<Void, RunError> {
-    // *******************
-    // * NOT IMPLEMENTED *
-    // *******************
+    // ***************
+    // * IMPLEMENTED *
+    // ***************
     
     if CommandLine.arguments.capacity != 3 {
         return .failure(.invalidArguments)
@@ -30,19 +30,25 @@ func main() -> Result<Void, RunError> {
     let fileData = file.readDataToEndOfFile()
     file.closeFile()
     
-    var automata: FiniteAutomata?
     do {
-        try automata = JSONDecoder().decode(FiniteAutomata.self, from: fileData)
-    }
-    catch {
-        return .failure(.automataDecodingError)
-    }
-    
-    if let _automata = automata {
-        let simulator = Simulator(finiteAutomata: _automata)
+        let automata = try JSONDecoder().decode(FiniteAutomata.self, from: fileData)
+        
+        let simulator = Simulator(finiteAutomata: automata)
+        
+        try simulator.validate()
+        
         for state in simulator.simulate(on: inputSymbols) {
             print(state)
         }
+    }
+    catch AutomataError.undefinedState {
+        return .failure(.undefinedState)
+    }
+    catch AutomataError.undefinedSymbol {
+        return .failure(.undefinedSymbol)
+    }
+    catch {
+        return .failure(.automataDecodingError)
     }
     
     return .success(Void())

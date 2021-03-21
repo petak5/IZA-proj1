@@ -6,15 +6,19 @@
 //
 
 /// Finite automata
-public struct FiniteAutomata {
+public struct FiniteAutomata: Decodable {
     // *******************
     // * NOT IMPLEMENTED *
     // *******************
+    public var states: [String]
+    public var symbols: [String]
+    public var transitions: [Transitions]
+    public var initialState: String
+    public var finalStates: [String]
 }
 
-
-extension FiniteAutomata: Decodable {
-    // *******************
-    // * NOT IMPLEMENTED *
-    // *******************
+public struct Transitions: Decodable {
+    public var with: String
+    public var to: String
+    public var from: String
 }
