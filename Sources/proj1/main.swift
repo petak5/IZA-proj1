@@ -37,7 +37,13 @@ func main() -> Result<Void, RunError> {
         
         try simulator.validate()
         
-        for state in simulator.simulate(on: inputSymbols) {
+        let states = simulator.simulate(on: inputSymbols)
+        
+        if states.isEmpty {
+            return .failure(.inputNotAccepted)
+        }
+        
+        for state in states {
             print(state)
         }
     }

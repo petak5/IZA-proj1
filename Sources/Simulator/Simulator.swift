@@ -38,17 +38,46 @@ public struct Simulator {
             symbols.append(String(symbol))
         }
         
-        let result = _simulate(on: symbols)
+        let result = _simulate(on: symbols, with: finiteAutomata.initialState)
         
-        return result
+        return result ?? []
     }
     
-    func _simulate(on string: [String]) -> [String] {
+    private func _simulate(on symbols: [String], with state: String) -> [String]? {
         var result: [String] = []
         
+        // Ugly stuff going on here :(
+        var symbols = symbols
+        
+        if symbols.isEmpty {
+            if finiteAutomata.finalStates.contains(state) {
+                return [state]
+            } else {
+                return nil
+            }
+        }
+        
+        result.append(state)
+        
+        let currentSymbol = symbols.removeFirst()
+        
+        if !finiteAutomata.symbols.contains(currentSymbol) {
+            return nil
+        }
+        
+        for transition in finiteAutomata.transitions {
+            if transition.from == state && transition.with == currentSymbol {
+                if let states = _simulate(on: symbols, with: transition.to) {
+                    result.append(contentsOf: states)
+                    return result
+                }
+            }
+        }
         
         
-        return result
+        
+        
+        return nil
     }
     
     /// Validate if automata is valid (states and symbols)
@@ -67,7 +96,7 @@ public struct Simulator {
         }
         
         // Transitions' states `from` and `to` have to be in states
-        // and `with` has to be in symbols
+        // and symbol `with` has to be in symbols
         for transition in finiteAutomata.transitions {
             if !finiteAutomata.states.contains(transition.from) {
                 throw AutomataError.undefinedState
