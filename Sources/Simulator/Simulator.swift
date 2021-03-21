@@ -29,9 +29,9 @@ public struct Simulator {
     /// - Returns: Empty array if given string is not accepted by automata,
     ///     otherwise array of states
     public func simulate(on string: String) -> [String] {
-        // *******************
-        // * NOT IMPLEMENTED *
-        // *******************
+        // ***************
+        // * IMPLEMENTED *
+        // ***************
         
         var symbols: [String] = []
         for symbol in string.split(separator: ",") {
@@ -40,15 +40,22 @@ public struct Simulator {
         
         let result = _simulate(on: symbols, with: finiteAutomata.initialState)
         
+        // Return empty array on failure (input not accepted by the autotata)
         return result ?? []
     }
     
+    /// Helper recursive function for running simulation
+    /// - Parameter symbols: Array of strings representing input symbols
+    /// - Parameter state: Current state
+    /// - Returns: Array of states that given symbols have transitioned or nil if given symbols are not accepted by the automata
     private func _simulate(on symbols: [String], with state: String) -> [String]? {
         var result: [String] = []
         
         // Ugly stuff going on here :(
         var symbols = symbols
         
+        // End of input string
+        // Check current state
         if symbols.isEmpty {
             if finiteAutomata.finalStates.contains(state) {
                 return [state]
@@ -57,14 +64,17 @@ public struct Simulator {
             }
         }
         
+        // Append current state to result, if any error occures nil will be returned instead, invalidating this path
         result.append(state)
         
         let currentSymbol = symbols.removeFirst()
         
+        // Symbols in input string are not validated in `validate` function, so doing it here
         if !finiteAutomata.symbols.contains(currentSymbol) {
             return nil
         }
         
+        // Check all possible transitions, because the automata is not deterministic
         for transition in finiteAutomata.transitions {
             if transition.from == state && transition.with == currentSymbol {
                 if let states = _simulate(on: symbols, with: transition.to) {
@@ -74,9 +84,7 @@ public struct Simulator {
             }
         }
         
-        
-        
-        
+        // No possible path from current state
         return nil
     }
     

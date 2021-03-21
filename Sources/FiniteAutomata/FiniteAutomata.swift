@@ -7,9 +7,9 @@
 
 /// Finite automata
 public struct FiniteAutomata: Decodable {
-    // *******************
-    // * NOT IMPLEMENTED *
-    // *******************
+    // ***************
+    // * IMPLEMENTED *
+    // ***************
     public var states: [String]
     public var symbols: [String]
     public var transitions: [Transitions]

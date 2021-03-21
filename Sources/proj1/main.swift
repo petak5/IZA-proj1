@@ -23,7 +23,6 @@ func main() -> Result<Void, RunError> {
     let automataPath = NSString(string: CommandLine.arguments[2]).expandingTildeInPath
     
     guard let file: FileHandle = FileHandle(forReadingAtPath: automataPath) else {
-        print(automataPath)
         return .failure(.fileHandlingError)
     }
     
@@ -34,15 +33,12 @@ func main() -> Result<Void, RunError> {
         let automata = try JSONDecoder().decode(FiniteAutomata.self, from: fileData)
         
         let simulator = Simulator(finiteAutomata: automata)
-        
         try simulator.validate()
         
         let states = simulator.simulate(on: inputSymbols)
-        
         if states.isEmpty {
             return .failure(.inputNotAccepted)
         }
-        
         for state in states {
             print(state)
         }
